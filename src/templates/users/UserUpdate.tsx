@@ -43,6 +43,7 @@ const documentTypeMultiSelectStyle = {
 
 const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
 {
+
     return (
         <section class="px-4">
             <div class="mb-2 ">
@@ -58,21 +59,24 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                         lastName: props.userSelected?.lastName,
                         email: props.userSelected?.email,
                         birthday: props.userSelected?.birthday,
-                        documentType: props.userSelected?.documentType,
+                        documentType: { ...documentTypeOptions.find( dniOption => dniOption.value === props.userSelected?.documentType ) },
                         documentNumber: props.userSelected?.documentNumber,
-                        gender: 'female',
+                        gender: props.userSelected?.gender,
                         phone: props.userSelected?.phone,
-                        country: props.userSelected?.country,
+                        country: { ...country.find( countryOption => countryOption.value === props.userSelected?.country ) },
                         address: props.userSelected?.address,
-                        roles: props.userSelected?.roles.map( role => role.id ),
+                        roles:SelectTransform.getOptionsObjectArray( props.userSelected?.roles, 'name', 'id' ),
                         permissions: SelectTransform.getOptionsSimpleArray( props.userSelected?.permissions ?? []  ),
-                        enable: props.userSelected?.enable
+                        enable: { ...states.find( enableOption => enableOption.value === props.userSelected?.enable ) },
+                        password: undefined,
+                        passwordConfirmation: undefined
                     }}
-                    // validation={UserUpdateSchema}
+                    validation={UserUpdateSchema}
                     onSubmit={async ( form ) =>
                     {
 
                         props.updateAction( form.values );
+
 
                     }}
                 >
@@ -88,6 +92,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Enter First Name"
                                 labelClass="dg-form-label"
                                 labelName="First name"
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="dg-form-full-field-wrapper">
@@ -99,31 +104,39 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Enter Last Name"
                                 labelClass="dg-form-label"
                                 labelName="Last name"
+                                errorClass="ml-1"
                             />
                         </div>
-                        <div class="dg-form-quarter-field-wrapper">
+                        {/* dg-form-quarter-field-wrapper */}
+                        <div class="dg-form-quarter-field-wrapper ">
                             <Label for="documentType" class="dg-form-label">ID number</Label>
                             <div class="flex w-full">
-                                <SingleSelect
-                                    id="documentType"
-                                    name="documentType"
-                                    options={documentTypeOptions}
-                                    isObject
-                                    displayValue="label"
-                                    style={documentTypeMultiSelectStyle}
-                                    // class="dg-form-field-full"
-                                    // style={{ 'border-radius': '100', 'height': '10px' }}
-                                    placeholder="Type"
-                                    labelClass="dg-form-label"
-                                />
-                                <Input
-                                    labelName=''
-                                    name="documentNumber"
-                                    type="text"
-                                    id="documentNumber"
-                                    class="flex-1 dg-form-field-quarter rounded-l-none"
-                                    placeholder="Enter ID"
-                                />
+                                <div>
+                                    <SingleSelect
+                                        id="documentType"
+                                        name="documentType"
+                                        options={documentTypeOptions}
+                                        isObject
+                                        displayValue="label"
+                                        style={documentTypeMultiSelectStyle}
+                                        // class="dg-form-field-full"
+                                        // style={{ 'border-radius': '100', 'height': '10px' }}
+                                        placeholder="Type"
+                                        labelClass="dg-form-label"
+                                        errorClass="ml-1"
+                                    />
+                                </div>
+                                <div>
+                                    <Input
+                                        labelName=''
+                                        name="documentNumber"
+                                        type="text"
+                                        id="documentNumber"
+                                        class="flex-1 dg-form-field-quarter rounded-l-none flex w-full mr-2"
+                                        placeholder="Enter ID"
+                                        errorClass="ml-1"
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -141,6 +154,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                     class="border-1 rounded-full border-main-gray-500 bg-gray-800 p-3 focus:bg-white focus:border-white m-1"
                                     labelClass="text-gray-400 text-xs font-bold mr-1"
                                     labelName="F"
+                                    errorChildren={false}
                                 />
                                 <Input
                                     name="gender"
@@ -150,15 +164,17 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                     class="border-1 rounded-full border-main-gray-500 bg-gray-800 p-3 focus:bg-white focus:border-white m-1"
                                     labelClass="text-gray-400 text-xs font-bold mr-1"
                                     labelName="M"
+                                    errorChildren={false}
                                 />
                                 <Input
                                     name="gender"
                                     type="radio"
                                     id="gender-o"
                                     value="other"
-                                    class="border-1 rounded-full border-main-gray-500 bg-gray-800 p-3 focus:bg-white focus:border-white m-1"
+                                    class="border-1 rounded-full border-main-gray-500 bg-gray-800 p-3 focus:bg-white focus:border-white m-1 mr-2"
                                     labelClass="text-gray-400 text-xs font-bold mr-1"
                                     labelName="Other"
+                                    errorClass="ml-1"
                                 />
                             </div>
                         </div>
@@ -171,6 +187,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 id="birthday"
                                 class="dg-form-field-full"
                                 placeholder="Choose the birthday..."
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="dg-form-quarter-field-wrapper">
@@ -184,6 +201,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 style={singleSelectStyle}
                                 placeholder="Type"
                                 labelClass="dg-form-label"
+                                errorClass="ml-1"
                             />
                         </div>
 
@@ -199,6 +217,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 class="dg-form-field-full"
                                 placeholder="Select Country"
                                 labelClass="dg-form-label"
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="dg-form-full-field-wrapper">
@@ -210,6 +229,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Your address..."
                                 labelClass="dg-form-label"
                                 labelName="Address"
+                                errorClass="ml-1"
                             />
                         </div>
                         <span class="w-full mt-5"> CONTACT INFORMATION </span>
@@ -222,6 +242,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Enter Email"
                                 labelClass="dg-form-label"
                                 labelName="Email"
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="dg-form-full-field-wrapper">
@@ -233,6 +254,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Enter number"
                                 labelClass="dg-form-label"
                                 labelName="Phone"
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="w-full mb-5 pr-2">
@@ -243,6 +265,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Enter Password"
                                 labelClass="dg-form-label"
                                 labelName="Password"
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="w-full mb-5 pr-2">
@@ -253,6 +276,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 placeholder="Repeat Password"
                                 labelClass="dg-form-label"
                                 labelName="Confirm Password"
+                                errorClass="ml-1"
                             />
                         </div>
                         <div class="dg-form-full-field-wrapper">
@@ -267,6 +291,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                                 class="dg-form-field-full"
                                 placeholder="Select Permissions"
                                 labelClass="dg-form-label"
+                                errorClass="ml-1"
                             />
                         </div>
 
@@ -274,13 +299,14 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                             <Label for="roles">Roles</Label>
                             <Multiselect
                                 name="roles"
-                                options={props.rolesList}
+                                options={SelectTransform.getOptionsObjectArray( props.rolesList, 'name', 'id' )}
                                 isObject
-                                displayValue="name"
+                                displayValue="label"
                                 id="roles"
                                 class="dg-form-field-full"
                                 placeholder="Select Roles"
                                 labelClass="dg-form-label"
+                                errorClass="ml-1"
                             />
                         </div>
 
@@ -293,7 +319,7 @@ const UserUpdate: Component<UserUpdateTemplateProps> =  ( props ) =>
                     </div>
                 </Form>
 
-            ) : <p>No role selected</p> }
+            ) : <p>No user selected</p> }
         </section>
     );
 };

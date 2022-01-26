@@ -18,16 +18,19 @@ import Button from '../../atoms/Button';
 import MediaObject from '../../molecules/MediaObject';
 import TitleWithButton from '../../molecules/TitleWithButton';
 import { For } from 'solid-js';
-import { Link } from 'solid-app-router';
+import { Link, Navigate, useNavigate, useSearchParams } from 'solid-app-router';
 import UserRemove from '../users/UserRemove';
 import ConfirmDelete from '../modal/ConfirmDelete';
+import IconLockOpen from '../../atoms/Icons/Stroke/IconLockOpen';
+import FilterFactory from '../../helpers/FilterFactory';
+import FilterSort from '../../organisms/FilterSort';
 
 interface userListTemplateProps
 {
     usersList: IUserApi[];
     query?: never;
     viewMore?: never;
-    removeAction?: any
+    removeAction: any;
 }
 
 const UserList: Component<userListTemplateProps> = ( props ) =>
@@ -36,6 +39,7 @@ const UserList: Component<userListTemplateProps> = ( props ) =>
     const [ idSelected, setIdSelected ] = createSignal( '' );
     const [ text, setText ] = createSignal();
     const [ getShowScroll, setShowScroll ] = createSignal( false );
+    const navigate = useNavigate();
 
     const openConfirmDelete = ( id: string, lastName: string, firstName: string ): void =>
     {
@@ -59,14 +63,24 @@ const UserList: Component<userListTemplateProps> = ( props ) =>
     };
     const onClickFilter = ( search: string, filterBy: string, orderBy: string, sort: 'asc' | 'desc' ) =>
     {
-        // dispatch(resetUsers() );
-        // dispatch(resetQueryPagination() );
 
-        // const uriParam = FilterFactory.getUriParam({ search, filterBy, orderBy, sort } );
+        // dispatch( resetUsers() );
+        // dispatch( resetQueryPagination() );
+        const uriParam = FilterFactory.getUriParam( { search, filterBy, orderBy, sort } );
 
-        // router.push(`/users/list?${uriParam}`, undefined, { shallow: false } );
+        // router.push( `/users/list?${uriParam}`, undefined, { shallow: false } );
+        navigate( `/users/list?${uriParam}`, undefined );
+        // const { search, filterBy } = useParams<{search: string; filterBy: string;}>();
+        // console.log( useParams() );
+        // const params = useParams();
+        // console.log( JSON.stringify( params ) );
+        // props.searchAction( params.search, params.filterBy );
+        const [ searchParams, setSearchParams ] = useSearchParams();
+        console.log( searchParams );
+
         return true;
     };
+
 
     const checkScrollTop = () =>
     {
@@ -113,6 +127,7 @@ const UserList: Component<userListTemplateProps> = ( props ) =>
                 path="/users/create"
             />
             {/* <FilterSort actionFilter={onClickFilter} filterQuery={props.query} placeholder="Search roles..." /> */}
+            <FilterSort actionFilter={onClickFilter}/>
             <div class="dg-grid-3x3">
 
                 <For each={props.usersList} fallback={<div>Loading...</div>}>
@@ -131,13 +146,13 @@ const UserList: Component<userListTemplateProps> = ( props ) =>
                                         <IconPencilAlt />
                                     </Link>
                                 </div>
-                                {/* <div class="h-6 w-6 my-1">
+                                <div class="h-6 w-6 my-1">
                                     <Link
                                         class="w-6 hover:text-gray-700 mr-1 focus:outline-none"
-                                        href={`/users/view/${item.id}`}>
-                                        <IconViewMediaObject />
+                                        href={`/users/editPassword/${item.id}`}>
+                                        <IconLockOpen />
                                     </Link>
-                                </div> */}
+                                </div>
                                 <div class="h-6 w-6 my-1">
                                     <button
                                         class="w-6 hover:text-gray-700 mr-1 focus:outline-none"

@@ -1,29 +1,29 @@
-// import { getUsers, resetUsers } from "../../../redux/users/actions";
-// import { resetQueryPagination } from "../../../redux/general/actions";
-// import withAuth from "../../../providers/withAuth";
-// import { INIT_STATE } from '../../../redux/general/reducers';
 import UserList from '../../templates/users/UserList';
-import { createResource } from 'solid-js';
+import { createResource, createSignal } from 'solid-js';
 import { Component } from 'solid-js';
 import UserRepository from '../../repositories/UserRepository';
 import PrivateLayout from '../../templates/layout/PrivateLayout';
+import { useApplicationContext } from '../../context/context';
 
 const IndexPage: Component = () =>
 {
-    const userRepository = new UserRepository();
-    const [ data ] = createResource( userRepository.getUsers(), { initialValue: [] } );
+    const [ user ]: any = useApplicationContext();
+    const userRepository = new UserRepository( user() );
+    const fetchDataOriginal = userRepository.getUsers() ;
+    const [ sourceSignal, setSourceSignal ] = createSignal( '' );
+    const [ data ] = createResource( sourceSignal, fetchDataOriginal );
 
-    const removeAction = ( id: string  ) =>
+    const removeAction = async ( id: string  ) =>
     {
-        userRepository.removeUser( id );
+        const fetchData = userRepository.removeUser( id );
+        void await fetchData();
+        setSourceSignal( id );
     };
 
     return <PrivateLayout>
         <UserList
-            // viewMore={viewMore}
             usersList={data()}
             removeAction={removeAction}
-        // query={query}
         />
     </PrivateLayout>;
 };

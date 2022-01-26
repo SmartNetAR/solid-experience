@@ -3,7 +3,7 @@ import { HttpAxiosRequest } from '../services/HttpAxiosRequest';
 import { config } from './config';
 
 const { protocol, hostname, port } = config.apiGateway.server;
-const { getAll, remove, update, create, getOne } = config.apiGateway.routes.users;
+const { getAll, remove, update, create, getOne, editPassword, assignRole } = config.apiGateway.routes.users;
 
 class UserRepository
 {
@@ -27,7 +27,16 @@ class UserRepository
 
         return HttpAxiosRequest( config );
     };
+    public assignUserRole ( id: string, rolesId: any )
+    {
+        const config: AxiosRequestConfig = {
+            url: `${protocol}://${hostname}:${port}/${assignRole}/${id}`,
+            method: 'PUT',
+            data:{ rolesId }
+        };
 
+        return HttpAxiosRequest( config, this.user );
+    }
 
     public updateUser ( id: string, data: any )
     {
@@ -57,6 +66,17 @@ class UserRepository
         const config: AxiosRequestConfig = {
             url: `${protocol}://${hostname}:${port}/${remove}/${id}`,
             method: 'DELETE'
+        };
+
+        return HttpAxiosRequest( config, this.user );
+    }
+    public editPassword ( id: string, data: any )
+    {
+
+        const config: AxiosRequestConfig = {
+            url: `${protocol}://${hostname}:${port}/${editPassword}/${id}`,
+            method: 'PUT',
+            data
         };
 
         return HttpAxiosRequest( config, this.user );
